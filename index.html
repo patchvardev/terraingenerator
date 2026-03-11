@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Terrain Workshop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background: #000; color: #0f0; font-family: monospace; overflow: hidden; }
+        #ui { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid #0f0; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h3>SYSTEM ACTIVE</h3>
+        <button onclick="location.reload()">REGENERATE</button>
+    </div>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const geometry = new THREE.PlaneGeometry(100, 100, 50, 50);
+        const pos = geometry.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            let x = pos.getX(i) * 0.1;
+            let y = pos.getY(i) * 0.1;
+            pos.setZ(i, Math.sin(x) * Math.cos(y) * 10);
+        }
+        geometry.computeVertexNormals();
+        const material = new THREE.MeshPhongMaterial({ color: 0x00ff00, wireframe: true });
+        const terrain = new THREE.Mesh(geometry, material);
+        terrain.rotation.x = -Math.PI / 2;
+        scene.add(terrain);
+
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(0, 50, 0);
+        scene.add(light);
+
+        camera.position.z = 80;
+        camera.position.y = 40;
+        camera.lookAt(0,0,0);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            terrain.rotation.z += 0.005;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
